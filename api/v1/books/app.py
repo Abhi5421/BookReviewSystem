@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status,BackgroundTasks
 from api.v1.books.schema import Book, Review,UpdateBook,UpdateReview
 from database.connection import get_db
 from api.v1.books.utility import *
@@ -7,6 +7,7 @@ from utils.common import RaiseError
 from utils.logger import create_logger
 from fastapi.responses import JSONResponse
 from typing import Optional
+from utils.common import send_email
 
 router = APIRouter()
 
@@ -33,12 +34,16 @@ def endpoint_create_book(
 
 @router.post("/review")
 def endpoint_submit_review(
+        background_tasks: BackgroundTasks,
         data: Review,
         db: Session = Depends(get_db)
 ):
     try:
         response = submit_book_reviews(data, db)
-        return response
+        if response:
+            background_tasks.add_task(send_email)
+            return {"status": True, "detail": "submitted successfully"}
+        return {"status": False}
     except RaiseError as e:
         logging.error(e)
         return JSONResponse(content={'status': 'False', 'detail': e.detail, 'status_code': e.status_code},
