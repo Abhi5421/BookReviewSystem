@@ -10,8 +10,8 @@ class RaiseError(HTTPException):
 conf = ConnectionConfig(
     MAIL_USERNAME="mail_username",
     MAIL_PASSWORD="mail_password",
-    MAIL_FROM="mail_from",
-    MAIL_PORT="mail_port",
+    MAIL_FROM="admin@gmail.com",
+    MAIL_PORT=1,
     MAIL_SERVER="mail_host",
     MAIL_STARTTLS=False,
     MAIL_SSL_TLS=True,
